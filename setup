@@ -1,0 +1,70 @@
+STARTING KDC
+https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.idan400/kerkey.htm
+copy  EUVF.SEUVFSAM(SKRBKDC) to SYS1.PROCLIB
+mkdir /etc/skrb
+mkdir /etc/skrb/home
+mkdir /etc/skrb/home/kdc
+cp /usr/lpp/skrb/examples/krb5.conf  /etc/skrb/krb5.conf
+RDEFINE FACILITY IRR.RUSERMAP UACC(read)
+SETROPTS RACLIST(FACILITY) REFRESH
+AU skrbkdc DFLTGRP(sys1) NOPASSWORD OMVS(UID(0) PROGRAM('/bin/sh')
+       HOME('/etc/skrb/home/kdc'))
+RDEFINE REALM KERBDFLT KERB(KERBNAME(ZOS.JAKE.NET)
+       PASSWORD(password) MINTKTLFE(15) DEFTKTLFE(36000)
+       MAXTKTLFE(86400))
+
+SETROPTS CLASSACT(appl) RACLIST(appl)
+RDEFINE APPL SKRBKDC UACC(read)
+SETROPTS CLASSACT(ptktdata) RACLIST(ptktdata)
+RDEFINE PTKTDATA SKRBKDC UACC(none) SSIGNON(keymasked(3734343237343131))
+SETROPTS RACLIST(appl ptktdata) REFRESH
+SETROPTS GENERIC(started)
+RDEFINE STARTED SKRBKDC.** STDATA(user(skrbkdc))
+RDEFINE STARTED SKRBWTR.** STDATA(user(skrbkdc))
+SETROPTS RACLIST(started) REFRESH
+AU KADMIN DFLTGRP(sys1) PASSWORD(password) KERB(KERBNAME(kadmin/admin))
+ALU KADMIN PASSWORD(password) NOEXPIRED
+PASSWORD KADMIN NOINTERVAL
+AU CHANGEPW DFLTGRP(sys1) PASSWORD(password)
+KERB(kerbname(kadmin/changepw))
+ALU CHANGEPW PASSWORD(password) NOEXPIRED
+PASSWORD CHANGEPW NOINTERVAL
+
+AU (userid1) OWNER (IBMUSER) OMVS(UID(101))
+ALTUSER userid1 PASSWORD(password) NOEXPIRED KERB(KERBNAME(user1))
+
+AU TESTUSER PASSWORD(password) KERB(KERBNAME(test))
+ALU TESTUSER PASSWORD(password) NOEXPIRED
+ALU GOLDEN PASSWORD(password) KERB(KERBNAME(gold))
+ALU GOLDEN PASSWORD(password) NOEXPIRED
+
+
+
+AU TEST1 PASSWORD(TEST1) KERB(KERBNAME(test1))
+ALU TEST1 PASSWORD(password) NOEXPIRED
+
+AU FTP PASSWORD(FTP) DFLTGRP(SYS1) omvs(UID(3333) home('/u/ftp') prog('/bin/sh'))
+ALU FTP PASSWORD(FTP) KERB(KERBNAME(ftp/zos.jake.net)) NOEXPIRED
+LU FTP KERB NORACF
+keytab add ftp/duza.duza.net
+ftp zos.jake.net -a gssapi
+
+MVS S SKRBKDC
+MVS STOP SKRBKDC
+MVS F SKRBKDC,DEBUG ON
+
+S EZAZSSI,P=TCPIP
+TCPIP.HOSTS.LOCAL
+F RESOLVER,REFRESH
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.halz002/tcpip_host_entires.htm
+HOST : 192.168.1.20 : duza.duza.net ::::
+HOST : 192.168.1.138 : kali.duza.net ::::
+HOST : 192.168.1.20 : zos.jake.net ::::
+makesite hlq=tcpip
+
+RALTER REALM KERBDFLT KERB(KERBNAME(ZOS.JAKE.NET)
+       PASSWORD(password) MINTKTLFE(15) DEFTKTLFE(36000)
+       MAXTKTLFE(86400))
+
+kdb5_ndbm destroy
+kdb5_ndbm create

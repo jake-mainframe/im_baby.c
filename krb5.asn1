@@ -1,0 +1,24 @@
+KKDCP DEFINITIONS EXPLICIT TAGS ::=
+BEGIN
+
+PrincipalName ::= SEQUENCE {
+    name-type    [0] INTEGER,
+    name-string  [1] SEQUENCE OF GeneralString
+}
+
+Realm ::= GeneralString
+
+EncryptedData ::= SEQUENCE {
+    etype        [0] INTEGER,
+    kvno         [1] INTEGER OPTIONAL,
+    cipher       [2] OCTET STRING
+}
+
+Ticket ::= [APPLICATION 1] SEQUENCE {
+    tkt-vno      [0] INTEGER,
+    realm        [1] Realm,
+    sname        [2] PrincipalName,
+    enc-part     [3] EncryptedData
+}
+
+END

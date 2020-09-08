@@ -1,0 +1,41 @@
+important kerb files:
+/usr/lpp/skrb/bin
+
+/var/skrb/creds/
+
+/etc/skrb
+/etc/skrb/krb5.conf
+/etc/skrb/home/envar
+
+
+racf resources:
+
+
+step 1:
+is kerberos on
+external: port 88 and 469
+internal: /usr/lpp/skrb/bin/kinit randomprinc -> Status 0x96c73a06 - Client principal is not found in security registr
+
+step 2:
+check file permisions of all the important files
+
+step 3:
+view accepted encryption in envar and krb5.conf
+
+c programs
+c89 -2 -DS390 -Wc,"DLL,NOANSIALIAS" -Wl,DLL -o im_baby im_baby.c /usr/lib/EUVFKDLL.x -lskrb
+./im_baby DUZA.NET gold/duza.duza.net PASSWORD spns hosts
+
+
+https://dovetail.com/docs/ssh/kerberos_sso.pdf
+ADDUSER SSHDAEM DFLTGRP(SYS1) PASSWORD(tmppass) OMVS(UID(0) PROGRAM('/bin/sh') HOME('/') SHARED)
+ALTUSER SSHDAEM DFLTGRP(SYS1) PASSWORD(password) NOEXPIRED KERB(KERBNAME('host/zos.jake.net'))
+ALTUSER SSHDAEM NOPASSWORD
+You need the password for a client on the domain so jake/zos.jake.net
+GET TGS for host/zos.jake.net
+convert enc data of ticket in tgs to hashcat format
+crack the password for host/zos.jake.net - its derived from password so monocase and max 8 letters
+kinit host/zos.jake.net - enter the password you cracked
+you cant login normally as SSHDAEM has NOPASSWORD
+ssh with gsspi or ftp zos.jake.net -a gssapi
+you now have access to a root account because SSHDAEM has omvs(uid(0))
