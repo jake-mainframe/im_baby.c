@@ -24,7 +24,7 @@ view accepted encryption in envar and krb5.conf
 
 c programs
 c89 -2 -DS390 -Wc,"DLL,NOANSIALIAS" -Wl,DLL -o im_baby im_baby.c /usr/lib/EUVFKDLL.x -lskrb
-./im_baby DUZA.NET gold/duza.duza.net PASSWORD spns hosts
+./im_baby JAKE.NET jake JAKE1 spns hosts
 
 
 https://dovetail.com/docs/ssh/kerberos_sso.pdf

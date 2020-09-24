@@ -4,7 +4,7 @@
 /*c89 -2 -DS390 -Wc,"DLL,NOANSIALIAS" -Wl,DLL -o im_baby im_baby.c /usr/lib/EUVFKDLL.x -lskrb*/
 /*im_baby realm client_princ client_pass spn_file hosts_file*/
 /*$krb5tgs$18$user$realm$8efd91bb01cc69dd07e46009$7352410d6aafd72c64972a66058b02aa1c28ac580ba41137d5a170467f06f17faf5dfb3f95ecf4fad74821fdc7e63a3195573f45f962f86942cb24255e544ad8d05178d560f683a3f59ce94e82c8e724a3af0160be549b472dd83e6b80733ad349973885e9082617294c6cbbea92349671883eaf068d7f5dcfc0405d97fda27435082b82b24f3be27f06c19354bf32066933312c770424eb6143674756243c1bde78ee3294792dcc49008a1b54f32ec5d5695f899946d42a67ce2fb1c227cb1d2004c0*/
-
+/*last entry in files need to have space at the end*/
 void substring(char [], char[], int, int);
 
 int main(int argc, char *argv[])
